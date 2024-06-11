@@ -1,17 +1,18 @@
 {
-  "name": "healthhub-scraper",
-  "version": "1.0.0",
-  "description": "web scraper for healthhub",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
-  },
-  "author": "Tan Yong Rui",
-  "license": "ISC",
-  "dependencies": {
-    "chromedriver": "^125.0.3",
-    "dotenv": "^16.4.5",
-    "selenium-webdriver": "^4.21.0"
-  }
+    "name": "healthhub-scraper",
+    "version": "1.0.0",
+    "description": "web scraper for healthhub",
+    "main": "src/web-scraper.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node src/web-scraper.js",
+        "start-api-request": "node src/api-request.js"
+    },
+    "author": "Tan Yong Rui",
+    "license": "ISC",
+    "dependencies": {
+        "chromedriver": "^125.0.3",
+        "dotenv": "^16.4.5",
+        "selenium-webdriver": "^4.21.0"
+    }
 }
