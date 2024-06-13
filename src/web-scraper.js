@@ -1,4 +1,4 @@
-// Main entry point
+// main entry point for selenium webdriver web scraper
 require("dotenv").config({ path: "./.env" });
 require("chromedriver"); // add chrome driver to PATH
 const fs = require("fs");

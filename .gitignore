@@ -1,6 +1,7 @@
 # Actual scraped data
 data.json
 data.csv
+api-request-data-example.json
 
 # Logs
 logs
