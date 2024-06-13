@@ -7,7 +7,7 @@ const HEADER_ORIGIN = process.env.HEADER_ORIGIN;
 const HEADER_REFERER = process.env.HEADER_REFERER;
 const HEADER_X_API_KEY = process.env.HEADER_X_API_KEY;
 
-const PAGE_SIZE = 1; // too large leads to error 502
+const PAGE_SIZE = 100; // too large leads to error 502
 const CATEGORY_ID = 61; // for outpatient medical service
 
 (async function main() {
@@ -15,25 +15,28 @@ const CATEGORY_ID = 61; // for outpatient medical service
     while (true) {
         // packet example in api-request-data-example.json
         let packetData = await fetchData(pageNum, PAGE_SIZE, CATEGORY_ID);
-        console.log("- packetData:");
-        console.log(packetData);
+        // console.log("- packetData:");
+        // console.log(packetData); // check data
         let resultsList = packetData["Results"];
-        console.log("- resultsList:");
-        console.log(resultsList);
+        // console.log("- resultsList:");
+        // console.log(resultsList);
         if (resultsList.length == 0) {
+            // empty results; possibly reached the end
             break;
         }
         for (const result of resultsList) {
             console.log("- checking results");
-            console.log("- result:");
-            console.log(result);
+            // console.log("- result:");
+            // console.log(result);
             let name = result["Name"];
             console.log(name);
             let location = result["Address"];
             let HCICode = result["HciCode"];
             console.log(HCICode);
             let phoneNumber = result["TelephoneNumber"];
+            console.log(phoneNumber);
             let email = result["Email"];
+            console.log(email);
             let operationalHours = {};
             if (
                 result["OperatingHour"] != null &&
@@ -48,6 +51,7 @@ const CATEGORY_ID = 61; // for outpatient medical service
                     }
                 }
             }
+            console.log(operationalHours);
             let specifiedServices = [];
             if (
                 result["SpcServices"] != null &&
@@ -55,6 +59,7 @@ const CATEGORY_ID = 61; // for outpatient medical service
             ) {
                 specifiedServices = result["SpcServices"].split(",");
             }
+            console.log(specifiedServices);
 
             if (HCICode != undefined) {
                 // create object to hold the data
@@ -72,11 +77,12 @@ const CATEGORY_ID = 61; // for outpatient medical service
                             : specifiedServices,
                 };
 
+                // clinic info key is HCICode, a UUID
                 let jsonDictData = {};
                 jsonDictData[HCICode] = centreData;
 
                 // write dict data to json file
-                JsonWriter.jsonWrite(jsonDictData);
+                await JsonWriter.jsonWrite(jsonDictData);
             }
         }
 
@@ -117,7 +123,6 @@ async function fetchData(pageNum, pageSize, categoryId) {
 
     try {
         let response = await axios.request(options);
-        console.log(response.data); // check data
         console.log("- response data successfully retrieved.");
         return response.data;
     } catch (error) {
