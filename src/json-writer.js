@@ -3,36 +3,52 @@ const fs = require("fs").promises;
 const jsonFilePath = "data.json";
 
 class JsonWriter {
+    // store temporary dict of all stored data to improve runtime complexity
+    static existingDictData = {};
+
     static async jsonWrite(dictStringToAdd) {
         try {
-            let existingDictData;
-
-            try {
-                const fileData = await fs.readFile(jsonFilePath, "utf8");
-                // Parse the existing JSON content into JavaScript object
-                existingDictData = JSON.parse(fileData);
-            } catch (error) {
-                // Ignore error if file does not exist
-                if (error.code !== "ENOENT") {
-                    throw error;
-                }
+            let keys = Object.keys(dictStringToAdd);
+            let HCICodeKey = keys[0];
+            if (HCICodeKey in this.existingDictData) {
+                console.log(`- HCICode: ${HCICodeKey} already exists.`);
+                return; // do not continue to store data
             }
 
-            let finalDictData = dictStringToAdd;
-            if (existingDictData != undefined) {
-                if (dictStringToAdd[0] in existingDictData) {
-                    console.log(
-                        `- HCICode: ${dictStringToAdd[0]} already exists.`
-                    );
-                    return; // do not continue to store data
-                }
+            this.existingDictData[HCICodeKey] = dictStringToAdd[HCICodeKey];
+            let finalDictData = this.existingDictData;
 
-                // Combine the data objects
-                finalDictData = {
-                    ...existingDictData,
-                    ...dictStringToAdd,
-                };
-            }
+            // let existingDictData;
+
+            // try {
+            //     const fileData = await fs.readFile(jsonFilePath, "utf8");
+            //     // Parse the existing JSON content into JavaScript object
+            //     existingDictData = JSON.parse(fileData);
+            // } catch (error) {
+            //     // Ignore error if file does not exist
+            //     if (error.code !== "ENOENT") {
+            //         throw error;
+            //     }
+            // }
+
+            // let finalDictData = dictStringToAdd;
+            // if (existingDictData != undefined) {
+            //     let keys = Object.keys(dictStringToAdd);
+            //     let HCICodeKey = keys[0];
+            //     if (HCICodeKey in existingDictData) {
+            //         console.log(
+            //             `- HCICode: ${dictStringToAdd[0]} already exists.`
+            //         );
+            //         return; // do not continue to store data
+            //     }
+
+            //     // Combine the data objects
+            //     finalDictData = {
+            //         ...existingDictData,
+            //         ...dictStringToAdd,
+            //     };
+            // }
+
             await JsonWriter.writeDataToFile(finalDictData);
         } catch (error) {
             console.error("Error writing to JSON file: ", err);

@@ -12,6 +12,7 @@ const csvFilePath = "data.csv";
 const PAGE_SIZE = 1000; // too large leads to error 502
 const CATEGORY_ID = 61; // for outpatient medical service
 
+let count = 1;
 (async function main() {
     let pageNum = 1;
     while (true) {
@@ -30,10 +31,11 @@ const CATEGORY_ID = 61; // for outpatient medical service
             // empty results; possibly reached the end
             break;
         }
+
+        console.log(`- checking page ${pageNum}} results`);
         for (const result of resultsList) {
             // each result is a dict of info
-            console.log("- checking results");
-            // console.log("- result:");
+            console.log(`- result: ${count}`);
             // console.log(result);
 
             // copy data over
@@ -60,22 +62,22 @@ const CATEGORY_ID = 61; // for outpatient medical service
             centreData["OperatingHour"] = operationalHours;
 
             // reformat specified services
-            let specifiedServices = [];
-            if (
-                result["SpcServices"] != null &&
-                result["SpcServices"].length > 0 &&
-                result["LocationId"] != null
-            ) {
-                console.log(result["SpcServices"]);
-                let locationPacketData = await httpRequest.fetchLocationData(
-                    CATEGORY_ID,
-                    result["LocationId"]
-                );
-                let locationResult = locationPacketData["Results"];
-                specifiedServices = locationResult["SpcServices"].split(",");
-                centreData["SpcServices"] = specifiedServices;
-            }
-            console.log(specifiedServices);
+            // let specifiedServices = [];
+            // if (
+            //     result["SpcServices"] != null &&
+            //     result["SpcServices"].length > 0 &&
+            //     result["LocationId"] != null
+            // ) {
+            //     console.log(result["SpcServices"]);
+            //     let locationPacketData = await httpRequest.fetchLocationData(
+            //         CATEGORY_ID,
+            //         result["LocationId"]
+            //     );
+            //     let locationResult = locationPacketData["Results"];
+            //     specifiedServices = locationResult["SpcServices"].split(",");
+            //     centreData["SpcServices"] = specifiedServices;
+            //     console.log(specifiedServices);
+            // }
 
             if (HCICode != undefined) {
                 // clinic info key is HCICode, a UUID
@@ -85,6 +87,7 @@ const CATEGORY_ID = 61; // for outpatient medical service
                 // write dict data to json file
                 await JsonWriter.jsonWrite(jsonDict);
             }
+            count++;
         }
 
         // break
