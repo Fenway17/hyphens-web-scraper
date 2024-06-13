@@ -17,14 +17,14 @@ let count = 1;
     let pageNum = 1;
     while (true) {
         // packet example in api-request-data-example.json
-        let packetData = await httpRequest.fetchListData(
+        let packetDictData = await httpRequest.fetchListData(
             pageNum,
             PAGE_SIZE,
             CATEGORY_ID
         );
-        // console.log("- packetData:");
-        // console.log(packetData); // check data
-        let resultsList = packetData["Results"];
+        // console.log("- packetDictData:");
+        // console.log(packetDictData); // check data
+        let resultsList = packetDictData["Results"];
         // console.log("- resultsList:");
         // console.log(resultsList);
         if (resultsList.length == 0) {
@@ -61,24 +61,6 @@ let count = 1;
             }
             centreData["OperatingHour"] = operationalHours;
 
-            // reformat specified services
-            // let specifiedServices = [];
-            // if (
-            //     result["SpcServices"] != null &&
-            //     result["SpcServices"].length > 0 &&
-            //     result["LocationId"] != null
-            // ) {
-            //     console.log(result["SpcServices"]);
-            //     let locationPacketData = await httpRequest.fetchLocationData(
-            //         CATEGORY_ID,
-            //         result["LocationId"]
-            //     );
-            //     let locationResult = locationPacketData["Results"];
-            //     specifiedServices = locationResult["SpcServices"].split(",");
-            //     centreData["SpcServices"] = specifiedServices;
-            //     console.log(specifiedServices);
-            // }
-
             if (HCICode != undefined) {
                 // clinic info key is HCICode, a UUID
                 let jsonDict = {};
@@ -90,9 +72,11 @@ let count = 1;
             count++;
         }
 
-        // break
+        break;
         pageNum++; // go to next page
     }
+    // fix SpcServices code-name pairings
+    JsonWriter.fixSpcServices();
 
     // convert json to csv
     const jsonData = await fs.readFile(jsonFilePath, "utf8");
@@ -100,6 +84,7 @@ let count = 1;
     // convert json dict into a json list for better csv formatting
     let jsonList = [];
     for (const key in jsonDict) {
+        // filter out inherited properties from prototype
         if (jsonDict.hasOwnProperty(key)) {
             // console.log(`${key}: ${JSON.stringify(jsonDict[key])}`);
             jsonList.push(jsonDict[key]);
