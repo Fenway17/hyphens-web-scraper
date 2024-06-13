@@ -12,11 +12,11 @@ const HEADER_X_API_KEY = process.env.HEADER_X_API_KEY;
 const jsonFilePath = "data.json";
 const csvFilePath = "data.csv";
 
-const PAGE_SIZE = 100; // too large leads to error 502
+const PAGE_SIZE = 10; // too large leads to error 502
 const CATEGORY_ID = 61; // for outpatient medical service
 
 (async function main() {
-    let pageNum = 1;
+    let pageNum = 3;
     while (true) {
         // packet example in api-request-data-example.json
         let packetData = await fetchData(pageNum, PAGE_SIZE, CATEGORY_ID);
@@ -30,18 +30,16 @@ const CATEGORY_ID = 61; // for outpatient medical service
             break;
         }
         for (const result of resultsList) {
+            // each result is a dict of info
             console.log("- checking results");
             // console.log("- result:");
             // console.log(result);
-            let name = result["Name"];
-            console.log(name);
-            let location = result["Address"];
+            centreData = {};
+            for (const key in result) {
+                centreData[key] = result[key];
+            }
             let HCICode = result["HciCode"];
-            console.log(HCICode);
-            let phoneNumber = result["TelephoneNumber"];
-            console.log(phoneNumber);
-            let email = result["Email"];
-            console.log(email);
+            // console.log(HCICode);
             let operationalHours = {};
             if (
                 result["OperatingHour"] != null &&
@@ -56,32 +54,20 @@ const CATEGORY_ID = 61; // for outpatient medical service
                     }
                 }
             }
-            console.log(operationalHours);
-            let specifiedServices = [];
-            if (
-                result["SpcServices"] != null &&
-                result["SpcServices"].length > 0
-            ) {
-                specifiedServices = result["SpcServices"].split(",");
-            }
-            console.log(specifiedServices);
+            centreData["OperatingHour"] = operationalHours;
+
+            // // console.log(operationalHours);
+            // let specifiedServices = [];
+            // if (
+            //     result["SpcServices"] != null &&
+            //     result["SpcServices"].length > 0
+            // ) {
+            //     console.log(result["SpcServices"]);
+            //     specifiedServices = result["SpcServices"].split(",");
+            // }
+            // console.log(specifiedServices);
 
             if (HCICode != undefined) {
-                // create object to hold the data
-                let centreData = {
-                    name: name,
-                    location: location === undefined ? null : location,
-                    HCICode: HCICode === undefined ? null : HCICode,
-                    operational_hours: operationalHours,
-                    phone_number:
-                        phoneNumber === undefined ? null : phoneNumber,
-                    email: email === undefined ? null : email,
-                    specified_services:
-                        specifiedServices.length == 0
-                            ? null
-                            : specifiedServices,
-                };
-
                 // clinic info key is HCICode, a UUID
                 let jsonDict = {};
                 jsonDict[HCICode] = centreData;
@@ -101,12 +87,11 @@ const CATEGORY_ID = 61; // for outpatient medical service
     let jsonList = [];
     for (const key in jsonDict) {
         if (jsonDict.hasOwnProperty(key)) {
-            console.log(`${key}: ${JSON.stringify(jsonDict[key])}`);
+            // console.log(`${key}: ${JSON.stringify(jsonDict[key])}`);
             jsonList.push(jsonDict[key]);
         }
     }
     await JsonToCsv.writeJsonObjectToCsv(jsonList, csvFilePath);
-    // await JsonToCsv.writeJsonToCsv(jsonFilePath, csvFilePath);
 })();
 
 // fetch data through http request and return it
