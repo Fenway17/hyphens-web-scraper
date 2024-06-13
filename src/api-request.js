@@ -1,5 +1,6 @@
 const axios = require("axios");
 require("dotenv").config({ path: "./.env" });
+const fs = require("fs").promises;
 const JsonWriter = require("./json-writer");
 const JsonToCsv = require("./json-to-csv");
 
@@ -82,11 +83,11 @@ const CATEGORY_ID = 61; // for outpatient medical service
                 };
 
                 // clinic info key is HCICode, a UUID
-                let jsonDictData = {};
-                jsonDictData[HCICode] = centreData;
+                let jsonDict = {};
+                jsonDict[HCICode] = centreData;
 
                 // write dict data to json file
-                await JsonWriter.jsonWrite(jsonDictData);
+                await JsonWriter.jsonWrite(jsonDict);
             }
         }
 
@@ -94,7 +95,18 @@ const CATEGORY_ID = 61; // for outpatient medical service
         pageNum++; // go to next page
     }
     // convert json to csv
-    await JsonToCsv.convertJsonToCsv(jsonFilePath, csvFilePath);
+    const jsonData = await fs.readFile(jsonFilePath, "utf8");
+    const jsonDict = JSON.parse(jsonData);
+    // convert json dict into a json list for better csv formatting
+    let jsonList = [];
+    for (const key in jsonDict) {
+        if (jsonDict.hasOwnProperty(key)) {
+            console.log(`${key}: ${JSON.stringify(jsonDict[key])}`);
+            jsonList.push(jsonDict[key]);
+        }
+    }
+    await JsonToCsv.writeJsonObjectToCsv(jsonList, csvFilePath);
+    // await JsonToCsv.writeJsonToCsv(jsonFilePath, csvFilePath);
 })();
 
 // fetch data through http request and return it
