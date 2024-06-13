@@ -1,11 +1,15 @@
 const axios = require("axios");
 require("dotenv").config({ path: "./.env" });
 const JsonWriter = require("./json-writer");
+const JsonToCsv = require("./json-to-csv");
 
 const API_URL = process.env.API_URL;
 const HEADER_ORIGIN = process.env.HEADER_ORIGIN;
 const HEADER_REFERER = process.env.HEADER_REFERER;
 const HEADER_X_API_KEY = process.env.HEADER_X_API_KEY;
+
+const jsonFilePath = "data.json";
+const csvFilePath = "data.csv";
 
 const PAGE_SIZE = 100; // too large leads to error 502
 const CATEGORY_ID = 61; // for outpatient medical service
@@ -86,8 +90,11 @@ const CATEGORY_ID = 61; // for outpatient medical service
             }
         }
 
+        break;
         pageNum++; // go to next page
     }
+    // convert json to csv
+    await JsonToCsv.convertJsonToCsv(jsonFilePath, csvFilePath);
 })();
 
 // fetch data through http request and return it

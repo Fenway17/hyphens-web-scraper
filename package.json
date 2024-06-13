@@ -13,6 +13,7 @@
     "dependencies": {
         "chromedriver": "^125.0.3",
         "dotenv": "^16.4.5",
+        "json2csv": "^6.0.0-alpha.2",
         "selenium-webdriver": "^4.21.0"
     }
 }
