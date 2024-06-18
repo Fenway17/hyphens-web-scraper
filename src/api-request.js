@@ -12,8 +12,8 @@ const csvFilePath = "data.csv";
 const PAGE_SIZE = 1000; // too large leads to error 502
 const CATEGORY_ID = 61; // for outpatient medical service
 
-let count = 1;
 (async function main() {
+    let count = 1;
     let pageNum = 1;
     while (true) {
         // packet example in api-request-data-example.json
@@ -42,7 +42,6 @@ let count = 1;
             centreData = result;
 
             let HCICode = result["HciCode"];
-            // console.log(HCICode);
 
             // reformat operation hours
             let operationalHours = {};
