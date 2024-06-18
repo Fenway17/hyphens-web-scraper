@@ -8,7 +8,7 @@ const HEADER_REFERER = process.env.HEADER_REFERER;
 const HEADER_X_API_KEY = process.env.HEADER_X_API_KEY;
 
 // fetch data through http request and return it
-async function fetchListData(pageNum, pageSize, categoryId) {
+async function fetchListData(pageNum, pageSize, categoryId, retries = 3) {
     console.log("- fetching list data...");
     const options = {
         method: "GET",
@@ -38,19 +38,26 @@ async function fetchListData(pageNum, pageSize, categoryId) {
         },
     };
 
-    try {
-        let response = await axios.request(options);
-        console.log("- list response data successfully retrieved.");
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error.message);
-        throw error;
+    for (let i = 0; i < retries; i++) {
+        try {
+            let response = await axios.request(options);
+            console.log("- list response data successfully retrieved.");
+            return response.data;
+        } catch (error) {
+            if (error.code === "ECONNRESET" && i < retries - 1) {
+                // connection reset by peer
+                console.warn(`Retrying... (${i + 1}/${retries})`);
+            } else {
+                console.error("Error fetching data:", error.message);
+                throw error;
+            }
+        }
     }
 }
 
 ("?categoryId=61&locationId=110707");
 
-async function fetchLocationData(categoryId, locationId) {
+async function fetchLocationData(categoryId, locationId, retries = 3) {
     console.log("- fetching location data...");
     // Define the URL and query parameters
     const options = {
@@ -81,14 +88,21 @@ async function fetchLocationData(categoryId, locationId) {
         },
     };
 
-    // Axios request with axios.request
-    try {
-        let response = await axios.request(options);
-        console.log("- location response data successfully retrieved.");
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error.message);
-        throw error;
+    // request with axios.request
+    for (let i = 0; i < retries; i++) {
+        try {
+            let response = await axios.request(options);
+            console.log("- location response data successfully retrieved.");
+            return response.data;
+        } catch (error) {
+            if (error.code === "ECONNRESET" && i < retries - 1) {
+                // connection reset by peer
+                console.warn(`Retrying... (${i + 1}/${retries})`);
+            } else {
+                console.error("Error fetching data:", error.message);
+                throw error;
+            }
+        }
     }
 }
 
