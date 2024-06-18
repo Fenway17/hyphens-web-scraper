@@ -172,7 +172,8 @@ const CLINIC_SERVICES_CLASS =
                 jsonDictData[HCICode] = centreData;
 
                 // write dict data to json file
-                JsonWriter.jsonWrite(jsonDictData);
+                JsonWriter.jsonWriterAdd(jsonDictData);
+                JsonWriter.writeDataToFile();
             }
 
             // navigate back to the directory page
