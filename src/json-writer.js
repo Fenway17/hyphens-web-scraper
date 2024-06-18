@@ -12,7 +12,7 @@ class JsonWriter {
     // pairings of code to service name
     static spcServicesCodePairings = {};
 
-    static async jsonWrite(dictStringToAdd) {
+    static async jsonWriterAdd(dictStringToAdd) {
         try {
             let keys = Object.keys(dictStringToAdd);
             let HCICodeKey = keys[0];
@@ -22,7 +22,6 @@ class JsonWriter {
             }
 
             this.existingDictData[HCICodeKey] = dictStringToAdd[HCICodeKey];
-            let finalDictData = this.existingDictData;
 
             // let existingDictData;
 
@@ -55,7 +54,7 @@ class JsonWriter {
             //     };
             // }
 
-            await this.writeDataToFile(finalDictData);
+            // await this.writeDataToFile(finalDictData);
         } catch (error) {
             console.error("Error writing to JSON file: ", err);
             return;
@@ -63,19 +62,18 @@ class JsonWriter {
     }
 
     // Function to write data to the file
-    static async writeDataToFile(data) {
+    static async writeDataToFile() {
         // Convert the data to a JSON string
         // `null, 2` for pretty-printing
-        let jsonString = JSON.stringify(data, null, 2);
+        let jsonString = JSON.stringify(this.existingDictData, null, 2);
 
         // Write the JSON string back to the file
-        await fs.writeFile(jsonFilePath, jsonString, "utf8", (err) => {
-            if (err) {
-                console.error("Error writing to JSON file:", err);
-            } else {
-                console.log("Data added to JSON file successfully.");
-            }
-        });
+        try {
+            await fs.writeFile(jsonFilePath, jsonString, "utf8");
+            console.log("Json file written to successfully");
+        } catch (error) {
+            console.error("Error writing to JSON file:", err);
+        }
     }
 
     // fix the entries in data.json where specfied services are
@@ -145,7 +143,7 @@ class JsonWriter {
                 this.existingDictData[key]["SpcServices"] = spcServicesList;
             }
         }
-        await this.writeDataToFile(this.existingDictData);
+        await this.writeDataToFile();
     }
 }
 

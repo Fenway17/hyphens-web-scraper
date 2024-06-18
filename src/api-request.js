@@ -66,15 +66,18 @@ let count = 1;
                 let jsonDict = {};
                 jsonDict[HCICode] = centreData;
 
-                // write dict data to json file
-                await JsonWriter.jsonWrite(jsonDict);
+                // add dict data to json writer
+                await JsonWriter.jsonWriterAdd(jsonDict);
             }
             count++;
         }
 
-        break;
+        // break;
         pageNum++; // go to next page
     }
+    // write json writer data to json file
+    await JsonWriter.writeDataToFile();
+
     // fix SpcServices code-name pairings
     await JsonWriter.fixSpcServices();
 
