@@ -32,7 +32,7 @@ let count = 1;
             break;
         }
 
-        console.log(`- checking page ${pageNum}} results`);
+        console.log(`- checking page ${pageNum} results`);
         for (const result of resultsList) {
             // each result is a dict of info
             console.log(`- result: ${count}`);
@@ -76,7 +76,7 @@ let count = 1;
         pageNum++; // go to next page
     }
     // fix SpcServices code-name pairings
-    JsonWriter.fixSpcServices();
+    await JsonWriter.fixSpcServices();
 
     // convert json to csv
     const jsonData = await fs.readFile(jsonFilePath, "utf8");
