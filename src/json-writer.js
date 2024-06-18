@@ -17,44 +17,11 @@ class JsonWriter {
             let keys = Object.keys(dictStringToAdd);
             let HCICodeKey = keys[0];
             if (HCICodeKey in this.existingDictData) {
-                console.log(`- HCICode: ${HCICodeKey} already exists.`);
+                console.log(`--- HCICode: ${HCICodeKey} already exists.`);
                 return; // do not continue to store data
             }
 
             this.existingDictData[HCICodeKey] = dictStringToAdd[HCICodeKey];
-
-            // let existingDictData;
-
-            // try {
-            //     const fileData = await fs.readFile(jsonFilePath, "utf8");
-            //     // Parse the existing JSON content into JavaScript object
-            //     existingDictData = JSON.parse(fileData);
-            // } catch (error) {
-            //     // Ignore error if file does not exist
-            //     if (error.code !== "ENOENT") {
-            //         throw error;
-            //     }
-            // }
-
-            // let finalDictData = dictStringToAdd;
-            // if (existingDictData != undefined) {
-            //     let keys = Object.keys(dictStringToAdd);
-            //     let HCICodeKey = keys[0];
-            //     if (HCICodeKey in existingDictData) {
-            //         console.log(
-            //             `- HCICode: ${dictStringToAdd[0]} already exists.`
-            //         );
-            //         return; // do not continue to store data
-            //     }
-
-            //     // Combine the data objects
-            //     finalDictData = {
-            //         ...existingDictData,
-            //         ...dictStringToAdd,
-            //     };
-            // }
-
-            // await this.writeDataToFile(finalDictData);
         } catch (error) {
             console.error("Error writing to JSON file: ", err);
             return;
@@ -80,6 +47,7 @@ class JsonWriter {
     // tagged with a code instead of service names
     static async fixSpcServices() {
         for (let key in this.existingDictData) {
+            // check all entries with defined spc-services lists
             if (
                 this.existingDictData.hasOwnProperty(key) &&
                 this.existingDictData[key]["SpcServices"] != null &&
@@ -95,14 +63,17 @@ class JsonWriter {
                 // split string by ","
                 // trim to remove leading and trailing whitespaces
                 // filter out empty strings
-                let spcServicesList = centreData["SpcServices"]
+                let spcServicesCodeList = centreData["SpcServices"]
                     .split(",")
                     .map((part) => part.trim())
                     .filter((part) => part !== "");
-                // remove duplicates through Set (disallows duplicates) and spread
-                spcServicesList = [...new Set(spcServicesList)];
 
-                for (let spcServiceCode of spcServicesList) {
+                // remove duplicates through Set (disallows duplicates) and spread
+                spcServicesCodeList = [...new Set(spcServicesCodeList)];
+
+                let keyCodesToRemove = [];
+                for (let spcServiceCode of spcServicesCodeList) {
+                    // start code to name pairing attempts
                     if (
                         !this.spcServicesCodePairings.hasOwnProperty(
                             spcServiceCode
@@ -111,7 +82,7 @@ class JsonWriter {
                         // code not recorded in pairings dict
                         // check specific location page for spc service names
                         console.log(
-                            `- requesting location data for: ${spcServiceCode}`
+                            `- requesting location data for code: ${spcServiceCode}`
                         );
                         let packetDictData =
                             await httpRequest.fetchLocationData(
@@ -124,23 +95,62 @@ class JsonWriter {
                             .split(",")
                             .map((part) => part.trim())
                             .filter((part) => part !== "");
+
                         // populate code pairings dict
-                        for (let i = 0; i < spcServicesList.length; i++) {
-                            console.log(
-                                `- pairing ${spcServicesList[i]} <-> ${spcServicesNameList[i]}`
-                            );
-                            this.spcServicesCodePairings[spcServicesList[i]] =
-                                spcServicesNameList[i];
+                        for (let i = 0; i < spcServicesCodeList.length; i++) {
+                            // check current name pairing
+                            let currentCode = spcServicesCodeList[i];
+                            let currentNamePairing =
+                                this.spcServicesCodePairings[currentCode];
+                            let newNamePairing = spcServicesNameList[i];
+                            if (
+                                currentNamePairing == undefined &&
+                                newNamePairing != undefined
+                            ) {
+                                // no pairings currently exist and new pairing possible
+                                console.log(
+                                    `--- pairing ${currentCode} <-> ${newNamePairing}`
+                                );
+                                this.spcServicesCodePairings[currentCode] =
+                                    newNamePairing;
+                            } else if (currentNamePairing != undefined) {
+                                // existing code pairing found
+                                console.log(
+                                    `-- ${currentCode} has existing pairing ${currentCode} <-> ${currentNamePairing}`
+                                );
+                            } else if (newNamePairing == undefined) {
+                                // missing code pairing found
+                                console.log(
+                                    `-- location id ${centreData["LocationId"]} has missing pairing ${currentCode} <-> ${newNamePairing}`
+                                );
+                                // temporarily pair to undefined for current code list of current centre
+                                this.spcServicesCodePairings[currentCode] =
+                                    newNamePairing;
+
+                                // add to list of keys to remove after processing this centre's codes
+                                keyCodesToRemove.push(currentCode);
+                            }
                         }
                     }
-                    // code recorded before
-                    spcServicesList = spcServicesList.map((item) =>
+                    // code recorded before, start mapping of code to name
+                    spcServicesCodeList = spcServicesCodeList.map((item) =>
                         item === spcServiceCode
                             ? this.spcServicesCodePairings[spcServiceCode]
                             : item
                     );
+
+                    // filter out any undefined mappings
+                    spcServicesCodeList = spcServicesCodeList.filter(
+                        (item) => item != undefined
+                    );
                 }
-                this.existingDictData[key]["SpcServices"] = spcServicesList;
+
+                // remove all codes paired to undefined
+                for (let keyCodeToRemove of keyCodesToRemove) {
+                    delete this.spcServicesCodePairings[keyCodeToRemove];
+                }
+
+                this.existingDictData[key]["SpcServices"] = spcServicesCodeList;
             }
         }
         await this.writeDataToFile();

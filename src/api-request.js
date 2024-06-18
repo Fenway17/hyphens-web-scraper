@@ -35,7 +35,7 @@ let count = 1;
         console.log(`- checking page ${pageNum} results`);
         for (const result of resultsList) {
             // each result is a dict of info
-            console.log(`- result: ${count}`);
+            console.log(`- result no.: ${count}`);
             // console.log(result);
 
             // copy data over
