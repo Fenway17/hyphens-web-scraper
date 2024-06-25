@@ -60,8 +60,6 @@ async function fetchListData(pageNum, pageSize, categoryId, retries = 3) {
     }
 }
 
-("?categoryId=61&locationId=110707");
-
 async function fetchLocationData(categoryId, locationId, retries = 3) {
     console.log("Axios HTTP: fetching location data...");
     // Define the URL and query parameters

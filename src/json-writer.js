@@ -1,15 +1,14 @@
 const fs = require("fs").promises;
 const httpRequest = require("./http-request");
-const apiRequest = require("./api-request");
 
 // path to JSON file
 const jsonFilePath = "data.json";
 const CATEGORY_ID = 61;
 
 class JsonWriter {
-    // temporary dict of all stored data to improve runtime complexity
+    // temporary dict of all stored data; to improve runtime complexity
     static existingDictData = {};
-    // pairings of code to service name
+    // pairings of code to service name; to reduce number of HTTP requests sent
     static spcServicesCodePairings = {};
 
     static async jsonWriterAdd(dictStringToAdd) {
@@ -30,11 +29,11 @@ class JsonWriter {
 
     // Function to write data to the file
     static async writeDataToFile() {
-        // Convert the data to a JSON string
+        // convert the data to a JSON string
         // `null, 2` for pretty-printing
         let jsonString = JSON.stringify(this.existingDictData, null, 2);
 
-        // Write the JSON string back to the file
+        // write the JSON string back to the file
         try {
             await fs.writeFile(jsonFilePath, jsonString, "utf8");
             console.log("Json file written to successfully");
