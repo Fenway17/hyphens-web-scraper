@@ -2,11 +2,12 @@
     "name": "healthhub-scraper",
     "version": "1.0.0",
     "description": "web scraper for healthhub",
-    "main": "src/web-scraper.js",
+    "main": "src/healthhub/web-scraper.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node src/web-scraper.js",
-        "start-api-request": "node src/api-request.js"
+        "start": "node src/healthhub/web-scraper.js",
+        "start-api-request-hh": "node src/healthhub/api-request.js",
+        "start-api-request-smc": "node src/singapore-medical-council/api-request.js"
     },
     "author": "Tan Yong Rui",
     "license": "ISC",
@@ -14,6 +15,7 @@
         "chromedriver": "^125.0.3",
         "dotenv": "^16.4.5",
         "json2csv": "^6.0.0-alpha.2",
+        "qs": "^6.12.1",
         "selenium-webdriver": "^4.21.0"
     }
 }

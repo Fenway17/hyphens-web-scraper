@@ -1,5 +1,5 @@
 const fs = require("fs").promises;
-const httpRequest = require("./http-request");
+const httpRequest = require("./healthhub/http-request");
 
 // path to JSON file
 const jsonFilePath = "data.json";

@@ -1,11 +1,11 @@
 const axios = require("axios");
 require("dotenv").config({ path: "./.env" });
 
-const API_URL_LOCATION_LIST = process.env.API_URL_LOCATION_LIST;
-const API_URL_LOCATION = process.env.API_URL_LOCATION;
-const HEADER_ORIGIN = process.env.HEADER_ORIGIN;
-const HEADER_REFERER = process.env.HEADER_REFERER;
-const HEADER_X_API_KEY = process.env.HEADER_X_API_KEY;
+const API_URL_LOCATION_LIST = process.env.HH_API_URL_LOCATION_LIST;
+const API_URL_LOCATION = process.env.HH_API_URL_LOCATION;
+const HEADER_ORIGIN = process.env.HH_HEADER_ORIGIN;
+const HEADER_REFERER = process.env.HH_HEADER_REFERER;
+const HEADER_X_API_KEY = process.env.HH_HEADER_X_API_KEY;
 
 // fetch data through http request and return it
 async function fetchListData(pageNum, pageSize, categoryId, retries = 3) {

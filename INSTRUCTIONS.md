@@ -1,10 +1,10 @@
-# HOW TO RUN API REQUEST SCRIPT
+# HOW TO RUN HEALTHHUB API REQUEST SCRIPT
 
 -   Use `npm run start-api-request` to run the HTTP-API-request script
 
 -   Approximately < 5 mins of total runtime needed
 
-# POSSIBLE REQUIRED CHANGES
+## POSSIBLE REQUIRED CHANGES
 
 -   `.env` contains paramaters that are used in the HTTP request to contact the website
     API to obtain HTTP response packets containing required information; this prevents
@@ -13,7 +13,7 @@
 -   Should the HTTP request headers change due to some update on the website, the paramaters of
     the HTTP request used in the script will also need to be updated.
 
-# HOW TO DEBUG API REQUEST SCRIPT
+## HOW TO DEBUG HEALTHHUB API REQUEST SCRIPT
 
 -   HTTP request headers' information can be found on the website itself, through browser
     inspection tools. With inspection open, refresh the webpage showing the list of clients.
@@ -35,3 +35,5 @@
 -   DISCLAIMER: using this method results in 3-5 seconds of runtime per entry to scrape, and
     alongside 15000+ entries total, would result in about 12 hours of runtime at worst time
     complexity.
+
+# USAGE OF SMC API REQUEST SCRIPT

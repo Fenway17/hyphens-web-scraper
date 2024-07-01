@@ -2,10 +2,10 @@
 require("dotenv").config({ path: "./.env" });
 require("chromedriver"); // add chrome driver to PATH
 const { Builder, By, Key, until } = require("selenium-webdriver");
-const JsonWriter = require("./json-writer");
+const JsonWriter = require("../json-writer");
 
 // environment variables
-const WEBSITE_URL = process.env.WEBSITE_URL;
+const WEBSITE_URL = process.env.HH_WEBSITE_URL;
 
 // regex
 // optional country code, optional area code, 7-8 digit phone number (optional middle separation)

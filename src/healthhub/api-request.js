@@ -2,8 +2,8 @@
 const axios = require("axios");
 require("dotenv").config({ path: "./.env" });
 const fs = require("fs").promises;
-const JsonWriter = require("./json-writer");
-const JsonToCsv = require("./json-to-csv");
+const JsonWriter = require("../json-writer");
+const JsonToCsv = require("../json-to-csv");
 const httpRequest = require("./http-request");
 
 const jsonFilePath = "data.json";
