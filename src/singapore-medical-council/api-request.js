@@ -1,5 +1,5 @@
 // main entry point for api request web scraper
-const axios = require("axios");
+const cheerio = require("cheerio");
 require("dotenv").config({ path: "./.env" });
 const fs = require("fs").promises;
 const JsonWriter = require("../json-writer");
@@ -12,12 +12,27 @@ const csvFilePath = "data.csv";
 (async function main() {
     let count = 1;
     let pageNum = 1;
+    // initialize an empty array to store the codes
+    let codes = [];
     while (true) {
-        let packetData = await httpRequest.fetchHTMLData();
+        let packetHTMLData = await httpRequest.fetchHTMLData();
         // console.log("- packetDictData:");
         // console.log(packetDictData); // check data
 
         console.log(`- checking page ${pageNum} results`);
+
+        // load HTML into Cheerio
+        const $ = cheerio.load(packetHTMLData);
+
+        // find codes that start and end with a letter, contain 5 alphanumerics in the middle, inside brackets
+        const codePattern = /\([A-Za-z]\w{5}[A-Za-z]\)/g;
+        const matches = packetHTMLData.match(codePattern);
+
+        if (matches) {
+            codes.push(...matches);
+        }
+
+        console.log(codes);
 
         break;
         pageNum++; // go to next page

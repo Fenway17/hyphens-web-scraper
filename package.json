@@ -12,6 +12,7 @@
     "author": "Tan Yong Rui",
     "license": "ISC",
     "dependencies": {
+        "cheerio": "^1.0.0-rc.12",
         "chromedriver": "^125.0.3",
         "dotenv": "^16.4.5",
         "json2csv": "^6.0.0-alpha.2",

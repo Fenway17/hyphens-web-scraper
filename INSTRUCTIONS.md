@@ -37,3 +37,13 @@
     complexity.
 
 # USAGE OF SMC API REQUEST SCRIPT
+
+-   DISCLAIMER: Requires user to obtain a valid cookie
+-   Visit `www.healthprofessionals.gov.sg/smc` and navigate to "Search for registered doctors"
+    -   Alternatively `https://prs.moh.gov.sg/prs/internet/profSearch/main.action?hpe=SMC`
+-   Open network inspection tools
+-   Accept terms of conditions and search for "All" registered doctors and click "Search"
+    -   This creates a usable cookie that be found in the browser's network
+-   Go to `https://prs.moh.gov.sg/prs/internet/profSearch/getSearchSummaryByName.action#`
+    -   Under the browser's network tab, find the HTTP packet used to get the HTML information
+    -   Copy and paste the HTTP request's "Cookie" into `.env`

@@ -1,5 +1,4 @@
 // main entry point for api request web scraper
-const axios = require("axios");
 require("dotenv").config({ path: "./.env" });
 const fs = require("fs").promises;
 const JsonWriter = require("../json-writer");
