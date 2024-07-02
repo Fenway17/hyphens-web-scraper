@@ -22,7 +22,7 @@ class JsonWriter {
 
             this.existingDictData[HCICodeKey] = dictStringToAdd[HCICodeKey];
         } catch (error) {
-            console.error("Error writing to JSON file: ", err);
+            console.error("Error writing to JSON file: ", error);
             return;
         }
     }
@@ -38,7 +38,7 @@ class JsonWriter {
             await fs.writeFile(jsonFilePath, jsonString, "utf8");
             console.log("Json file written to successfully");
         } catch (error) {
-            console.error("Error writing to JSON file:", err);
+            console.error("Error writing to JSON file:", error);
         }
     }
 

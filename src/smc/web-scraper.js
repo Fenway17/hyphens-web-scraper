@@ -1,6 +1,7 @@
 // main entry point for selenium webdriver web scraper
 require("dotenv").config({ path: "./.env" });
 require("chromedriver"); // add chrome driver to PATH
+const chrome = require("selenium-webdriver/chrome");
 const { Builder, By, Key, until } = require("selenium-webdriver");
 const JsonWriter = require("./json-writer");
 
@@ -20,7 +21,7 @@ const NAME_LIST_CSS = "div.font15px";
 const CLINIC_GENERAL_INFO_CLASS = "flex flex-col md:flex md:w-full";
 
 const timeoutDuration = 10000; // 10 seconds
-const captchaWaitDuration = 1000; // 1 second
+const captchaWaitDuration = 5000;
 const codePattern = /\([A-Za-z0-9]{7}\)/g;
 
 // storage for all unique ids
@@ -29,7 +30,12 @@ let codes = [];
 (async function main() {
     // setup Chrome WebDriver
     console.log("- creating driver");
-    let driver = await new Builder().forBrowser("chrome").build();
+    let options = new chrome.Options();
+    options.addArguments("--start-maximized");
+    let driver = await new Builder()
+        .forBrowser("chrome")
+        .setChromeOptions(options)
+        .build();
 
     try {
         // navigate to the main directory page
@@ -39,21 +45,42 @@ let codes = [];
         console.log("- loading page");
 
         // find iframe and switch to it
-        let iframe = await driver.wait(
+        let mainIFrame = await driver.wait(
             until.elementLocated(By.name("msg_main")),
             timeoutDuration
         );
-        await driver.switchTo().frame(iframe);
+        await driver.switchTo().frame(mainIFrame);
 
+        let pageNum = 1;
         while (true) {
+            console.log(`SEARCHING PAGE: ${pageNum}`);
             // check for captcha
             try {
-                let checkbox = await driver.wait(
-                    until.elementLocated(By.id("recaptcha-anchor")),
+                let captchaIFrame = await driver.wait(
+                    until.elementLocated(By.css('[title="reCAPTCHA"]')),
                     captchaWaitDuration
                 );
+                console.log("-- captcha found");
+
+                // switch to captcha iframe
+                await driver.switchTo().frame(captchaIFrame);
+
+                let checkbox = await driver.wait(
+                    until.elementLocated(
+                        By.css(".rc-anchor-content"),
+                        captchaWaitDuration
+                    )
+                );
+                // let checkbox = await driver.findElement(
+                //     By.className("recaptcha-checkbox-checkmark")
+                // );
+                // simulate a click using JavaScript
+                // await driver.executeScript("arguments[0].click();", checkbox);
                 await checkbox.click();
                 console.log("-- captcha checkbox found and clicked");
+
+                // switch back to parent iframe
+                await driver.switchTo().parentFrame();
             } catch (error) {
                 console.log("-- no captcha checkbox found or clicked");
             }
@@ -69,6 +96,7 @@ let codes = [];
                 if (!isSelected) {
                     await checkbox.click();
                 }
+                console.log("-- t&c checkbox found and clicked");
 
                 // click search button
                 let searchButton = await driver.wait(
@@ -106,6 +134,7 @@ let codes = [];
                 console.log("- navigating to next page");
                 let nextButton = await driver.findElement(By.linkText("Next"));
                 await nextButton.click();
+                pageNum++;
                 console.log("- clicked the Next button");
             } catch (error) {
                 // possibly reached the last page, exit loop

@@ -13,7 +13,7 @@ class JsonWriterSMC {
 
     static async jsonWriterWriteCodes(codeStringList) {
         try {
-            for (code in codeStringList) {
+            for (let code in codeStringList) {
                 if (code in codes) {
                     // code already exists, do not add
                     continue;
@@ -29,7 +29,7 @@ class JsonWriterSMC {
             await fs.writeFile(codeFilePath, jsonString, "utf8");
             console.log("code JSON file written to successfully");
         } catch (error) {
-            console.error("Error writing to JSON file: ", err);
+            console.error("Error writing to JSON file: ", error);
             return;
         }
     }
@@ -45,7 +45,7 @@ class JsonWriterSMC {
 
             this.existingDictData[HCICodeKey] = dictStringToAdd[HCICodeKey];
         } catch (error) {
-            console.error("Error writing to JSON file: ", err);
+            console.error("Error writing to JSON file: ", error);
             return;
         }
     }
@@ -61,7 +61,7 @@ class JsonWriterSMC {
             await fs.writeFile(jsonFilePath, jsonString, "utf8");
             console.log("Json file written to successfully");
         } catch (error) {
-            console.error("Error writing to JSON file:", err);
+            console.error("Error writing to JSON file:", error);
         }
     }
 }
