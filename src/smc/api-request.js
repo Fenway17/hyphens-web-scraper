@@ -2,7 +2,7 @@
 const cheerio = require("cheerio");
 require("dotenv").config({ path: "./.env" });
 const fs = require("fs").promises;
-const JsonWriter = require("../json-writer");
+const JsonWriter = require("../healthhub/json-writer");
 const JsonToCsv = require("../json-to-csv");
 const httpRequest = require("./http-request");
 
