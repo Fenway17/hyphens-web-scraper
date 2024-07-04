@@ -14,7 +14,7 @@ class JsonWriterSMC {
     static async jsonWriterWriteCodes(codeStringList) {
         try {
             for (let code in codeStringList) {
-                if (code in codes) {
+                if (code in this.codes) {
                     // code already exists, do not add
                     continue;
                 }
