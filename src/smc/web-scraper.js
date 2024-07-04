@@ -27,6 +27,7 @@ const CLINIC_GENERAL_INFO_CLASS = "flex flex-col md:flex md:w-full";
 
 const timeoutDuration = 10000; // 10 seconds
 const captchaWaitDuration = 3000;
+const captchaPuzzleWaitDuration = 600000; // 10 mins
 const codePattern = /\([A-Za-z0-9]{7}\)/g;
 
 // storage for all unique ids
@@ -114,7 +115,7 @@ async function humanLikeMouseMovement(driver, element) {
             console.log(`SEARCHING PAGE: ${pageNum}`);
 
             // simulate some human-like activity before interacting with the page
-            let sleepDuration = 1000 + Math.random() * 2000;
+            let sleepDuration = 20000 + Math.random() * 5000;
             await sleep(sleepDuration);
             console.log(`-- sleeping for ${sleepDuration} ms`);
 
@@ -151,32 +152,60 @@ async function humanLikeMouseMovement(driver, element) {
                 let sleepDuration = 1000 + Math.random() * 1000;
                 await sleep(sleepDuration);
                 console.log(`-- sleeping for ${sleepDuration} ms`);
+
+                // switch back to parent iframe
+                await driver.switchTo().parentFrame();
+                isInCaptchaIFrame = false;
+
+                // check for image select captcha
+                // Check if the reCAPTCHA puzzle iframe appears
+                let puzzleIframe;
+                try {
+                    puzzleIframe = await driver.wait(
+                        until.elementLocated(
+                            By.css(
+                                'iframe[src*="https://www.google.com/recaptcha/api2/bframe"]'
+                            )
+                        ),
+                        timeoutDuration
+                    );
+                    console.log(
+                        "-- reCAPTCHA puzzle detected, waiting for user to solve it..."
+                    );
+                } catch (error) {
+                    console.log("-- reCAPTCHA puzzle not detected");
+                }
+
+                // if puzzle iframe is detected, wait for it to complete
+                if (puzzleIframe) {
+                    // await driver.wait(
+                    //     until.stalenessOf(puzzleIframe),
+                    //     captchaPuzzleWaitDuration
+                    // );
+
+                    // switch to captcha iframe
+                    await driver.switchTo().frame(captchaIFrame);
+                    isInCaptchaIFrame = true;
+                    console.log("-- switched to captcha iframe");
+
+                    // check for checkbox checkmark
+                    await driver.wait(
+                        until.elementLocated(
+                            By.css(".recaptcha-checkbox-checked")
+                        ),
+                        captchaPuzzleWaitDuration
+                    );
+                    console.log("-- reCAPTCHA puzzle solved");
+                }
             } catch (error) {
-                console.log("-- no captcha checkbox found or clicked");
+                console.log("-- no captcha found and/or clicked");
             } finally {
+                // ensure navigation is not stuck in captcha iframe
                 if (isInCaptchaIFrame) {
                     // switch back to parent iframe
                     await driver.switchTo().parentFrame();
                     isInCaptchaIFrame = false;
                 }
-            }
-
-            // check for image select captcha
-            try {
-                let captchaIFrame = await driver.wait(
-                    until.elementLocated(
-                        By.css(
-                            '[title="recaptcha challenge expires in two minutes"]'
-                        )
-                    ),
-                    captchaWaitDuration
-                );
-                console.log("-- captcha puzzle found, PLEASE SOLVE");
-
-                // wait 20 seconds for user to solve puzzle
-                await sleep(20000);
-            } catch (error) {
-                console.log("-- no captcha puzzle found");
             }
 
             // check for and accept terms and conditions
