@@ -18,13 +18,35 @@ function loadLocalHtml(filePath) {
 }
 
 // grab required text data from SMC HTML data
-async function extractDataSMC(filePath) {
+// filePath for local HTML file, and html for raw html data
+async function extractDataSMC(filePath = null, html = null) {
+    let results = [];
+
+    if (filePath == null && html == null) {
+        // no parameters
+        console.warn("called extractDataSMC with no paramaneters");
+        return results;
+    }
+
+    if (filePath != null && html != null) {
+        // both parameters provided
+        console.warn("called extractDataSMC with conflicting paramaneters");
+        return results;
+    }
+
     try {
-        // load HTML content
-        const html = await loadLocalHtml(filePath);
+        let htmlData;
+        if (filePath != null) {
+            // load HTML content
+            htmlData = await loadLocalHtml(filePath);
+        }
+
+        if (html != null) {
+            htmlData = html;
+        }
 
         // parse HTML content
-        const $ = cheerio.load(html);
+        const $ = cheerio.load(htmlData);
 
         // find the profDetails element
         const profDetails = $("#profDetails");
@@ -48,14 +70,17 @@ async function extractDataSMC(filePath) {
             // replace multiple whitespaces with a single space
             text = text.replace(/\s+/g, " ");
             console.log(`Text from element ${index + 1}: ${text}`);
+            results.push(text);
         });
+
+        return results;
     } catch (error) {
         console.error("Error:", error);
     }
 }
 
 // Call the extractDataSMCs function
-extractDataSMC(htmlFilePath);
+extractDataSMC((filePath = htmlFilePath));
 
 module.exports = {
     extractDataSMC,

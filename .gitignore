@@ -1,6 +1,10 @@
 # Actual scraped data
 data.json
 data.csv
+hh-data.json
+hh-data.csv
+smc-data.json
+smc-data.csv
 codes.json
 cookies.json
 api-request-data-example.json

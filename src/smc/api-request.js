@@ -15,7 +15,7 @@ const csvFilePath = "data.csv";
     // initialize an empty array to store the codes
     let codes = [];
     while (true) {
-        let packetHTMLData = await httpRequest.fetchHTMLData();
+        let packetHTMLData = await httpRequest.fetchListHtmlData();
         // console.log("- packetDictData:");
         // console.log(packetDictData); // check data
 
