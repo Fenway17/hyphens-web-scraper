@@ -2,6 +2,7 @@
 require("dotenv").config({ path: "./.env" });
 require("chromedriver"); // add chrome driver to PATH
 const fs = require("fs");
+const cheerio = require('cheerio');
 const chrome = require("selenium-webdriver/chrome");
 const randomUseragent = require("random-useragent");
 const { Builder, By, Key, until } = require("selenium-webdriver");
@@ -18,12 +19,6 @@ const USER_AGENT =
 const phoneRegex =
     /(\+?\d{1,2}[\s.-]?)?(\(?\d{3}\)?[\s.-]?)?\d{3,4}[\s.-]?\d{4}/;
 const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
-
-// CSS associated with the required information
-const NAME_LIST_CSS = "div.font15px";
-
-// class info used in the HTML of required information
-const CLINIC_GENERAL_INFO_CLASS = "flex flex-col md:flex md:w-full";
 
 const timeoutDuration = 10000; // 10 seconds
 const captchaWaitDuration = 3000;
@@ -178,11 +173,6 @@ async function humanLikeMouseMovement(driver, element) {
 
                 // if puzzle iframe is detected, wait for it to complete
                 if (puzzleIframe) {
-                    // await driver.wait(
-                    //     until.stalenessOf(puzzleIframe),
-                    //     captchaPuzzleWaitDuration
-                    // );
-
                     // switch to captcha iframe
                     await driver.switchTo().frame(captchaIFrame);
                     isInCaptchaIFrame = true;
@@ -237,12 +227,14 @@ async function humanLikeMouseMovement(driver, element) {
                 until.elementsLocated(By.css("div.font15px")),
                 timeoutDuration
             );
+
             // extract the text content of those elements
             let textContents = await Promise.all(
                 elements.map(async (element) => {
                     return await element.getText();
                 })
             );
+
             // extract codes from the text contents
             textContents.forEach((text) => {
                 let matches = text.match(codePattern);
@@ -251,6 +243,12 @@ async function humanLikeMouseMovement(driver, element) {
                     codes.push(...matches);
                 }
             });
+
+            // for each code, obtain HTML page and grab info
+            for (let code of codes) {
+                // Locate the <div> element by id
+                let element = await driver.findElement(By.id('profDetails'));
+            }
 
             // navigate to next page
             try {

@@ -8,7 +8,8 @@
         "start-web-scraper-hh": "node src/healthhub/web-scraper.js",
         "start-web-scraper-smc": "node src/smc/web-scraper.js",
         "start-api-request-hh": "node src/healthhub/api-request.js",
-        "start-api-request-smc": "node src/smc/api-request.js"
+        "start-api-request-smc": "node src/smc/api-request.js",
+        "test-html-handler-smc": "node src/smc/html-handler.js"
     },
     "author": "Tan Yong Rui",
     "license": "ISC",
