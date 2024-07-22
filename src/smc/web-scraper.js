@@ -2,11 +2,13 @@
 require("dotenv").config({ path: "./.env" });
 require("chromedriver"); // add chrome driver to PATH
 const fs = require("fs");
-const cheerio = require('cheerio');
+const cheerio = require("cheerio");
 const chrome = require("selenium-webdriver/chrome");
 const randomUseragent = require("random-useragent");
 const { Builder, By, Key, until } = require("selenium-webdriver");
 const JsonWriter = require("./json-writer");
+const HtmlHandler = require("./html-handler");
+const HttpRequest = require("./http-request");
 
 // environment variables
 const WEBSITE_URL = process.env.SMC_WEBSITE_URL;
@@ -246,9 +248,31 @@ async function humanLikeMouseMovement(driver, element) {
 
             // for each code, obtain HTML page and grab info
             for (let code of codes) {
-                // Locate the <div> element by id
-                let element = await driver.findElement(By.id('profDetails'));
+                let htmlData = HttpRequest.fetchDoctorHtmlData((code = code));
+                let textArray = HtmlHandler.extractDataSMC((html = htmlData));
+                let newDict = {};
+
+                // input into new dictionary
+                newDict["name"] = textArray[0];
+                newDict["code"] = textArray[2];
+                newDict["qualifications"] = textArray[3];
+                newDict["provisional-registion"] = textArray[4];
+                newDict["current-registration"] = textArray[5];
+                newDict["cert-start"] = textArray[6];
+                newDict["cert-end"] = textArray[7];
+                newDict["reg-spec-date"] = textArray[8];
+                newDict["reg-family-phy-date"] = textArray[9];
+                newDict["practice-place"] = textArray[10];
+                newDict["address"] = textArray[11];
+                newDict["telephone"] = textArray[12];
+
+                let dictToAdd = {};
+                dictToAdd[code] = newDict;
+                JsonWriter.jsonWriterAdd(dictToAdd);
             }
+
+            // TODO: remove temp code
+            JsonWriter.writeDataToFile();
 
             // navigate to next page
             try {

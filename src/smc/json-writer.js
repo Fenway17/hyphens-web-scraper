@@ -2,8 +2,8 @@ const fs = require("fs").promises;
 const httpRequest = require("./http-request");
 
 // path to JSON file
-const jsonFilePath = "data.json";
-const codeFilePath = "codes.json";
+const jsonFilePath = "smc-data.json";
+const codeFilePath = "smc-codes.json";
 
 class JsonWriterSMC {
     // temporary dict of all stored data; to improve runtime complexity

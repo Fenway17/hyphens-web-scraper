@@ -57,21 +57,36 @@ async function extractDataSMC(filePath = null, html = null) {
         }
 
         // find elements with class no-border table-data within profDetails
-        const tableDataElements = profDetails.find(".no-border.table-data");
+        const tableDataTitle = profDetails.find(".table-head"); // doctor name
+        const tableDataElements = profDetails.find(".no-border.table-data"); // doctor details
 
         if (!tableDataElements.length) {
             console.log("No elements with class no-border table-data found.");
             return;
         }
 
+        if (!tableDataTitle.length) {
+            console.log("No elements with class table-head found.");
+            return;
+        }
+
+        // extract doctor name; eg. "ABC DEF GHI (M12345D)"
+        let doctorName = $(tableDataTitle.first()).text().trim();
+        // remove doctor code in brackets
+        doctorName = doctorName.replace(/\s*\(.*?\)\s*/g, "");
+        results.push(doctorName);
+
         // extract and print text from each table-data element
         tableDataElements.each((index, element) => {
             let text = $(element).text().trim();
             // replace multiple whitespaces with a single space
             text = text.replace(/\s+/g, " ");
-            console.log(`Text from element ${index + 1}: ${text}`);
             results.push(text);
         });
+
+        for (let result of results) {
+            console.log(`Element: ${result}`);
+        }
 
         return results;
     } catch (error) {
