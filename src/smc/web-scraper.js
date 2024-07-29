@@ -286,7 +286,8 @@ async function humanLikeMouseMovement(driver, element) {
                 await sleep(7000);
                 console.log("--- STEP 2 ---");
                 let textArray = await HtmlHandler.extractDataSMC(
-                    (html = htmlData)
+                    null,
+                    htmlData
                 );
                 let newDict = {};
                 console.log(textArray);

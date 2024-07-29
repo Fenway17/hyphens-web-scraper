@@ -95,7 +95,7 @@ async function extractDataSMC(filePath = null, html = null) {
 }
 
 // testing the call of the extractDataSMCs function
-// extractDataSMC((filePath = htmlFilePath));
+// extractDataSMC(htmlFilePath, null);
 
 module.exports = {
     extractDataSMC,
