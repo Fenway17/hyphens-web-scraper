@@ -38,6 +38,8 @@
 
 # USAGE OF SMC API REQUEST SCRIPT
 
+-   Delete cookies.json if script does not run properly (reset cookies)
+
 -   DISCLAIMER: Requires user to obtain a valid cookie
 -   Visit `www.healthprofessionals.gov.sg/smc` and navigate to "Search for registered doctors"
     -   Alternatively `https://prs.moh.gov.sg/prs/internet/profSearch/main.action?hpe=SMC`

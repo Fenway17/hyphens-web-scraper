@@ -37,13 +37,14 @@ class JsonWriterSMC {
     static async jsonWriterAdd(dictStringToAdd) {
         try {
             let keys = Object.keys(dictStringToAdd);
-            let HCICodeKey = keys[0];
-            if (HCICodeKey in this.existingDictData) {
-                console.log(`--- HCICode: ${HCICodeKey} already exists.`);
+            let docCode = keys[0];
+            if (docCode in this.existingDictData) {
+                console.log(`--- docCode: ${docCode} already exists.`);
                 return; // do not continue to store data
             }
 
-            this.existingDictData[HCICodeKey] = dictStringToAdd[HCICodeKey];
+            this.existingDictData[docCode] = dictStringToAdd[docCode];
+            console.log(`--- docCode: ${docCode} added`);
         } catch (error) {
             console.error("Error writing to JSON file: ", error);
             return;

@@ -2,7 +2,6 @@
 require("dotenv").config({ path: "./.env" });
 require("chromedriver"); // add chrome driver to PATH
 const fs = require("fs");
-const cheerio = require("cheerio");
 const chrome = require("selenium-webdriver/chrome");
 const randomUseragent = require("random-useragent");
 const { Builder, By, Key, until } = require("selenium-webdriver");
@@ -70,7 +69,7 @@ async function humanLikeMouseMovement(driver, element) {
         'Object.defineProperty(navigator, "webdriver", {get: () => undefined})'
     );
 
-    // // Set geolocation to Singapore
+    // // set geolocation to Singapore
     // await driver.executeCdpCommand("Emulation.setGeolocationOverride", {
     //     latitude: 1.3521,
     //     longitude: 103.8198,
@@ -241,16 +240,58 @@ async function humanLikeMouseMovement(driver, element) {
             textContents.forEach((text) => {
                 let matches = text.match(codePattern);
                 console.log(matches);
+                // remove brackets
+                matches = matches.map((str) => str.replace(/[()]/g, ""));
                 if (matches) {
                     codes.push(...matches);
                 }
             });
 
+            // grab cookies from browser can create cookie string
+            let finalCookieString = "";
+            let cookies = await driver.manage().getCookies();
+            let resultCookies = [];
+            let initialCookieString = "cookie.tableId=DEFAULT";
+            resultCookies.push(initialCookieString);
+            for (let cookie of cookies) {
+                if (cookie["domain"] == "prs.moh.gov.sg") {
+                    // correct cookie
+                    let cookieString = cookie["name"] + "=" + cookie["value"];
+                    resultCookies.push(cookieString);
+                }
+            }
+            finalCookieString = resultCookies.join("; ");
+            console.log(`-- cookie string: ${finalCookieString}`);
+
+            await sleep(3000);
+
             // for each code, obtain HTML page and grab info
             for (let code of codes) {
-                let htmlData = HttpRequest.fetchDoctorHtmlData((code = code));
-                let textArray = HtmlHandler.extractDataSMC((html = htmlData));
+                console.log("--- STEP 1 ---");
+                let htmlData = await HttpRequest.fetchDoctorHtmlData(
+                    code,
+                    finalCookieString
+                );
+
+                // Write the JSON string to a file
+                let filePath = "./responseHtmlData.html";
+                fs.writeFile(filePath, htmlData, "utf8", (err) => {
+                    if (err) {
+                        console.error("Error writing to file", err);
+                    } else {
+                        console.log("Response data saved to", filePath);
+                    }
+                });
+
+                await sleep(7000);
+                console.log("--- STEP 2 ---");
+                let textArray = await HtmlHandler.extractDataSMC(
+                    (html = htmlData)
+                );
                 let newDict = {};
+                console.log(textArray);
+
+                await sleep(100000);
 
                 // input into new dictionary
                 newDict["name"] = textArray[0];
@@ -269,10 +310,13 @@ async function humanLikeMouseMovement(driver, element) {
                 let dictToAdd = {};
                 dictToAdd[code] = newDict;
                 JsonWriter.jsonWriterAdd(dictToAdd);
+
+                await sleep(5000);
             }
 
             // TODO: remove temp code
             JsonWriter.writeDataToFile();
+            codes = []; // reset codes storage
 
             // navigate to next page
             try {
@@ -288,6 +332,7 @@ async function humanLikeMouseMovement(driver, element) {
             }
         }
 
+        // TODO: may be redundant
         // write codes to a json file
         console.log("- writing codes to JSON file");
         console.log(codes);
@@ -297,7 +342,6 @@ async function humanLikeMouseMovement(driver, element) {
         let cookies = await driver.manage().getCookies();
         fs.writeFileSync("cookies.json", JSON.stringify(cookies, null, 2));
 
-        // quit the driver
         // await driver.quit();
     }
 })();
