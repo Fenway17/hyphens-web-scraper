@@ -306,13 +306,13 @@ async function humanLikeMouseMovement(driver, element) {
 
                 let dictToAdd = {};
                 dictToAdd[code] = newDict;
-                JsonWriter.jsonWriterAdd(dictToAdd);
+                await JsonWriter.jsonWriterAdd(dictToAdd);
 
                 await sleep(2000);
             }
 
             // TODO: remove temp code
-            JsonWriter.writeDataToFile();
+            await JsonWriter.writeDataToFile();
             codes = []; // reset codes storage
 
             // navigate to next page
@@ -333,7 +333,7 @@ async function humanLikeMouseMovement(driver, element) {
         // write codes to a json file
         console.log("- writing codes to JSON file");
         console.log(codes);
-        JsonWriter.jsonWriterWriteCodes(codes);
+        await JsonWriter.jsonWriterWriteCodes(codes);
     } finally {
         // Save cookies
         let cookies = await driver.manage().getCookies();
