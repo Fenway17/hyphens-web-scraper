@@ -86,10 +86,9 @@ async function humanLikeMouseMovement(driver, element) {
 
         // refresh to use cookies
         await driver.navigate().refresh();
+        console.log("- loaded cookies");
     } else {
-        console.log(
-            "- cookies file does not exist, continuing without cookies"
-        );
+        console.log("- no cookies file, continuing without cookies");
     }
 
     try {
@@ -111,7 +110,7 @@ async function humanLikeMouseMovement(driver, element) {
             console.log(`SEARCHING PAGE: ${pageNum}`);
 
             // simulate some human-like activity before interacting with the page
-            let sleepDuration = 20000 + Math.random() * 5000;
+            let sleepDuration = 10000 + Math.random() * 3000;
             await sleep(sleepDuration);
             console.log(`-- sleeping for ${sleepDuration} ms`);
 
@@ -145,6 +144,7 @@ async function humanLikeMouseMovement(driver, element) {
                 console.log("-- captcha checkbox found and clicked");
 
                 // simulate some human-like activity before interacting with the page
+                // TODO: can add mouse movement
                 let sleepDuration = 1000 + Math.random() * 1000;
                 await sleep(sleepDuration);
                 console.log(`-- sleeping for ${sleepDuration} ms`);
@@ -166,7 +166,7 @@ async function humanLikeMouseMovement(driver, element) {
                         timeoutDuration
                     );
                     console.log(
-                        "-- reCAPTCHA puzzle detected, waiting for user to solve it..."
+                        "-- reCAPTCHA puzzle detected, waiting for user to solve..."
                     );
                 } catch (error) {
                     console.log("-- reCAPTCHA puzzle not detected");
@@ -263,11 +263,11 @@ async function humanLikeMouseMovement(driver, element) {
             finalCookieString = resultCookies.join("; ");
             console.log(`-- cookie string: ${finalCookieString}`);
 
-            await sleep(3000);
+            await sleep(1000);
 
             // for each code, obtain HTML page and grab info
             for (let code of codes) {
-                console.log("--- STEP 1 ---");
+                console.log("-- fetching doc data using HTTP");
                 let htmlData = await HttpRequest.fetchDoctorHtmlData(
                     code,
                     finalCookieString
@@ -283,16 +283,12 @@ async function humanLikeMouseMovement(driver, element) {
                     }
                 });
 
-                await sleep(7000);
-                console.log("--- STEP 2 ---");
                 let textArray = await HtmlHandler.extractDataSMC(
                     null,
                     htmlData
                 );
                 let newDict = {};
                 console.log(textArray);
-
-                await sleep(100000);
 
                 // input into new dictionary
                 newDict["name"] = textArray[0];
@@ -312,7 +308,7 @@ async function humanLikeMouseMovement(driver, element) {
                 dictToAdd[code] = newDict;
                 JsonWriter.jsonWriterAdd(dictToAdd);
 
-                await sleep(5000);
+                await sleep(2000);
             }
 
             // TODO: remove temp code
