@@ -1,4 +1,4 @@
-# healthhub-scraper
+# hyphens-scraper
 
 Web scraper to collect required information from websites
 
