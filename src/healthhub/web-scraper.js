@@ -1,11 +1,11 @@
 // main entry point for selenium webdriver web scraper
 require("dotenv").config({ path: "./.env" });
 require("chromedriver"); // add chrome driver to PATH
-const fs = require("fs");
 const { Builder, By, Key, until } = require("selenium-webdriver");
-const JsonWriter = require("./json-writer");
+const JsonWriter = require("../json-writer");
 
-const WEBSITE_URL = process.env.WEBSITE_URL;
+// environment variables
+const WEBSITE_URL = process.env.HH_WEBSITE_URL;
 
 // regex
 // optional country code, optional area code, 7-8 digit phone number (optional middle separation)
@@ -13,7 +13,7 @@ const phoneRegex =
     /(\+?\d{1,2}[\s.-]?)?(\(?\d{3}\)?[\s.-]?)?\d{3,4}[\s.-]?\d{4}/;
 const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
 
-// CSS associated to the required information
+// CSS associated with the required information
 const CLINIC_LIST_CSS =
     ".flex.w-full.flex-col.gap-4.px-8 > .mx-6.flex.flex-row.gap-4";
 const CLINIC_LIST_ELEMENT_CSS = ".flex.w-full.flex-col.gap-4.px-8 > div";
@@ -21,6 +21,7 @@ const CLINIC_NAME_CSS =
     ".flex.justify-center.text-2xl.font-semibold.tracking-tight";
 const CLINIC_LOCATION_CSS = ".text-2xl.font-semibold.tracking-tighter";
 const CLINIC_INFO_BOX_CSS = ".flex.w-full.flex-col.items-start";
+
 // class info used in the HTML of required information
 const CLINIC_LIST_PAGE_BUTTON_CLASS = "mt-4 flex justify-center";
 const CLINIC_GENERAL_INFO_CLASS = "flex flex-col md:flex md:w-full";
@@ -172,7 +173,8 @@ const CLINIC_SERVICES_CLASS =
                 jsonDictData[HCICode] = centreData;
 
                 // write dict data to json file
-                JsonWriter.jsonWrite(jsonDictData);
+                JsonWriter.jsonWriterAdd(jsonDictData);
+                JsonWriter.writeDataToFile();
             }
 
             // navigate back to the directory page
