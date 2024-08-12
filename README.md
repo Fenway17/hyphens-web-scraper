@@ -1,6 +1,7 @@
 # hyphens-scraper
 
 Web scraper to collect required information from websites
+Author: Tan Yong Rui
 
 ## HH Scraper
 
